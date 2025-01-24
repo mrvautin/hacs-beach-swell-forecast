@@ -1,0 +1,10 @@
+{
+  "domain": "beach_swell_forecast",
+  "name": "Beach Swell Forecast",
+  "version": "1.0",
+  "documentation": "https://github.com/mrvautin/hacs-beach-swell-forecast",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": ["@mrvautin"],
+  "config_flow": true
+}
