@@ -1,5 +1,5 @@
 {
-  "name": "Beach Swell Forecast",
+  "name": "Swell Forecast",
   "domains": ["sensor"],
   "iot_class": "cloud_polling",
   "homeassistant": "2025.1.0"

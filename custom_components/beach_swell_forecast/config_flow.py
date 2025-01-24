@@ -1,4 +1,4 @@
-"""Config flow for Beach Swell Forecast integration."""
+"""Config flow for Swell Forecast integration."""
 
 import voluptuous as vol  # type: ignore[attr-defined]
 
@@ -8,8 +8,8 @@ from .const import DOMAIN
 
 
 @config_entries.HANDLERS.register(DOMAIN)
-class BeachSwellForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Beach Swell Forecast."""
+class SwellForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle a config flow for Swell Forecast."""
 
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
@@ -17,7 +17,7 @@ class BeachSwellForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         """Handle the initial step of the config flow."""
         if user_input is not None:
-            return self.async_create_entry(title="Beach Swell Sensor", data=user_input)
+            return self.async_create_entry(title="Swell Sensor", data=user_input)
 
         return self.async_show_form(
             step_id="user",

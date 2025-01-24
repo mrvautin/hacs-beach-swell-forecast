@@ -1,6 +1,6 @@
 {
-  "domain": "beach_swell_forecast",
-  "name": "Beach Swell Forecast",
+  "domain": "swell_forecast",
+  "name": "Swell Forecast",
   "version": "1.0",
   "documentation": "https://github.com/mrvautin/hacs-beach-swell-forecast",
   "requirements": [],
