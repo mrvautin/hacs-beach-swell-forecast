@@ -22,7 +22,7 @@ class BeachSwellForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
-                vol.Required("location_name", default="Kira Qld Australia"): str,
+                vol.Required("location_name", default="Kirra Qld Australia"): str,
                 vol.Required("location_id", default="5842041f4e65fad6a7708be9"): str,
             }),
             description_placeholders={

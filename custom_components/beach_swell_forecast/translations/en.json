@@ -8,7 +8,7 @@
         },
         "description": "Enter the details of the swell location you want to monitor. See Github for help locating the Id.",
         "description_placeholders": {
-          "location_name": "Swell name used to name sensor. Recommend lowercase and underscores - Eg: kira_australia",
+          "location_name": "Swell name for the location - Eg: Kirra Australia",
           "location_id": "Swell Id of the location. More info <a href='https://github.com/mrvautin/hacs-beach-swell-forecast'>here</a>."
         }
       }
