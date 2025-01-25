@@ -1,12 +1,12 @@
 import logging  # noqa: D104
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.const import Platform
 
 from .const import DOMAIN
-from .utils import check_location_id
+from .utils import check_location
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -16,11 +16,11 @@ async def async_setup(hass, config):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up the integration from a config entry."""
-    _LOGGER.info("Setting up custom integration from config entry: %s", entry.data['location_id'])
+    _LOGGER.info("Setting up custom integration from config entry: %s", entry.data['location_name'])
 
-    location_id_check = await check_location_id(entry.data['location_id'])
-    if location_id_check is False:
-        raise ConfigEntryNotReady(f"Invalid location id: {entry.data['location_id']}")
+    location_check = await check_location(entry.data['location_latitude'], entry.data['location_longitude'])
+    if location_check is False:
+        raise ConfigEntryNotReady(f"Invalid location: {entry.data['location_latitude']} / {entry.data['location_longitude']}")
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = entry
