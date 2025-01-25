@@ -11,7 +11,7 @@ from homeassistant.util import Throttle # type: ignore
 from .utils import clean_string, get_attributes
 
 _LOGGER = logging.getLogger(__name__)
-SCAN_INTERVAL = timedelta(hour=1)
+SCAN_INTERVAL = timedelta(hours=1)
 
 SENSORS = [
     {"name": "Temperature Sensor 1", "unit_of_measurement": "°C"},
@@ -27,9 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         DayForecastSensor(entry.data, 2),
         DayForecastSensor(entry.data, 3),
         DayForecastSensor(entry.data, 4),
-        DayForecastSensor(entry.data, 5),
-        DayForecastSensor(entry.data, 6),
-        DayForecastSensor(entry.data, 7)
+        DayForecastSensor(entry.data, 5)
     ]
     async_add_entities(entities)
     updater = DataUpdater(entities, config_data)
@@ -47,7 +45,7 @@ class DataUpdater:
     @Throttle(SCAN_INTERVAL)
     async def async_update(self):
         """Fetch new data for the sensors and update their state."""
-        _LOGGER.info("Swell sensors updating: %s", self.config['location_id'])
+        _LOGGER.info("Swell sensor updating: %s", self.config['location_id'])
 
         url = f"https://services.surfline.com/kbyg/spots/forecasts/wave/?spotId={self.config['location_id']}&days=5&intervalHours=24"
         headers = {
@@ -55,14 +53,14 @@ class DataUpdater:
         }
         try:
             async with aiohttp.ClientSession() as session:
-                _LOGGER.info("Updating")
+                _LOGGER.info("Swell sensor updating data: %s", url)
                 async with session.get(url, headers=headers) as response:
                     if response.status == 200:
                         data = await response.json()
                         for sensor in self.sensors:
                             sensor.update_state(data)
                     else:
-                        _LOGGER.info("Got data: %s", response.status)
+                        _LOGGER.info("Swell sensor - Got data: %s", response.status)
         except aiohttp.ClientConnectorError as e:
             _LOGGER.info("Error: %s", e)
 
