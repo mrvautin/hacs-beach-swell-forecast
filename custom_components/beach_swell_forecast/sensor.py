@@ -1,17 +1,17 @@
-from datetime import timedelta  # noqa: D100
+from datetime import timedelta, datetime  # noqa: D100
 import logging
 
 import aiohttp  # type: ignore[import]
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import Entity
-from homeassistant.util import Throttle
+from homeassistant.config_entries import ConfigEntry # type: ignore
+from homeassistant.core import HomeAssistant # type: ignore
+from homeassistant.helpers.entity import Entity # type: ignore
+from homeassistant.util import Throttle # type: ignore
 
-from .utils import clean_string, get_attributes, get_readable_date
+from .utils import clean_string, get_attributes
 
 _LOGGER = logging.getLogger(__name__)
-SCAN_INTERVAL = timedelta(minutes=1)
+SCAN_INTERVAL = timedelta(hour=1)
 
 SENSORS = [
     {"name": "Temperature Sensor 1", "unit_of_measurement": "°C"},
@@ -101,6 +101,6 @@ class DayForecastSensor(Entity):
         """Update the state of the sensor with new data."""
         index = self._sensor_day - 1
         wave = data["data"]["wave"][index]
-        self._state = get_readable_date(wave)
+        self._state = datetime.now().isoformat()
         self._attributes = get_attributes(self, wave)
         self.async_write_ha_state()
