@@ -1,7 +1,7 @@
 # Swell Forecast
 
 <p align="center">
-  <img src="./assets/logo.png" height="150px" />
+  <img src="https://raw.githubusercontent.com/mrvautin/hacs-beach-swell-forecast/refs/heads/main/assets/logo.png" height="150px" />
 </p>
 
 This project provides a Home Assistant HACS integration to display a 7 day forecast for beach swells using [Surfline](https://www.surfline.com) data.
