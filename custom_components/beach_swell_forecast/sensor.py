@@ -13,12 +13,6 @@ from .utils import clean_string, get_attributes
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(hours=1)
 
-SENSORS = [
-    {"name": "Temperature Sensor 1", "unit_of_measurement": "°C"},
-    {"name": "Temperature Sensor 2", "unit_of_measurement": "°C"},
-    {"name": "Humidity Sensor", "unit_of_measurement": "%"},
-]
-
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
     """Set up the integration from a config entry."""
     config_data= entry.data
