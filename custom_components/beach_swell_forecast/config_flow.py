@@ -22,7 +22,7 @@ class BeachSwellForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
-                vol.Required("location_name", default="Kirra Qld Australia"): str,
+                vol.Required("location_name", default="Southport SA, Australia"): str,
                 vol.Required("location_latitude", default="-35.160006845204165"): str,
                 vol.Required("location_longitude", default="138.46987943548"): str,
             }),

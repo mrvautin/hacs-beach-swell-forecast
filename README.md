@@ -1,7 +1,7 @@
 # Swell Forecast
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/mrvautin/hacs-beach-swell-forecast/refs/heads/main/assets/logo.png" height="150px" />
+  <img src="https://raw.githubusercontent.com/mrvautin/hacs-beach-swell-forecast/refs/heads/main/assets/logo.png" width="150px" />
 </p>
 
 This project provides a Home Assistant HACS integration to display a 7 day forecast for beach swells using [Surfline](https://www.surfline.com) data.
@@ -27,58 +27,24 @@ A sensor is created with forecasts the next 7 days with data like:
 - In `Type` select `Integration`
 - Click `Add`
 
-Once installed select `Settings` > `Devices and services` > `ADD INTEGRATION` > Search for `Beach Swell Forecast`
+Once installed select `Settings` > `Devices and services` > `ADD INTEGRATION` > Search for `Swell Forecast`
 
-In `Swell location name` enter a name which is appropriate to the location - `Kirra Qld Australia`. 
+In `Swell location name` enter a name which is appropriate to the location - `Southport SA, Australia`. 
 
 > Note: it will be used to name the sensors 
 
-In `Swell location Id` you will need to locate the Id for your Swell. 
+In `Swell location latitude` you will need to latitude value for your Swell. 
+In `Swell location longitude` you will need to longitude value for your Swell. 
 
-1. Visit: https://www.surfline.com/surf-report/broadbeach/584204204e65fad6a77092d3
-2. Search for the name of your Swell
-3. Grab the Swell Id for your chosen swell from the URL bar. Eg: https://www.surfline.com/surf-report/<name of beach>/<swell id>
+In Google Maps, right click the beach location, select the latitude and longitude menu to copy to your clipboard.
 
-> The Swell Id section is all we need here. One example for Broadbeach Australia is: 584204204e65fad6a77092d3
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mrvautin/hacs-beach-swell-forecast/refs/heads/main/assets/google-maps.png" width="450px" />
+</p>
 
 ## Usage
 
-There are many ways to display the swell data. One possible way is to use an `entites` card which is able to 
-display attributes. 
-
-``` yaml
-title: Kirra Australia
-type: entities
-entities:
-  - entity: sensor.<location_name>_day1_forecast
-    name: Date
-    icon: mdi:calendar
-  - entity: sensor.<location_name>_day1_forecast
-    type: attribute
-    name: Probability
-    attribute: probability
-    icon: mdi:percent
-  - entity: sensor.<location_name>_day1_forecast
-    type: attribute
-    name: Human Relation
-    attribute: humanRelation
-    icon: mdi:human
-  - entity: sensor.<location_name>_day1_forecast
-    type: attribute
-    name: Max height feet
-    attribute: surfMaxFt
-    icon: mdi:wave-arrow-up
-  - entity: sensor.<location_name>_day1_forecast
-    type: attribute
-    name: Min height feet
-    attribute: surfMinFt
-    icon: mdi:wave-arrow-down
-  - entity: sensor.<location_name>_day1_forecast
-    type: attribute
-    name: Wave score
-    attribute: optimalScore
-    icon: mdi:wave
-```
+There are many ways to display the swell data. The best way is to use the [Lovelace Swell Forecast Card](https://github.com/mrvautin/lovelace-swell-forecast-card). 
 
 ## Contributing
 
