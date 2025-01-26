@@ -31,7 +31,10 @@ def optimal_wave(forecast):
         if wave_height > max_wave_height:
             max_wave_height = wave_height
             max_wave = str(wave_height) + "m @ " + hourly["time_value"]
-    return max_wave
+    return {
+        "max_wave_height": max_wave_height,
+        "max_wave": max_wave,
+    }
 
 def split_forecast(forecast):
     """Check if an entity with the given unique ID already exists."""
