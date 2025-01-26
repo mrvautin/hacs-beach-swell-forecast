@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta  # noqa: D100
+from datetime import datetime, timedelta
 import logging
 
 import aiohttp  # type: ignore[import]
@@ -40,10 +40,10 @@ class DataUpdater:
     @Throttle(SCAN_INTERVAL)
     async def async_update(self):
         """Fetch new data for the sensors and update their state."""
-        _LOGGER.info("Swell sensor updating: %s", self.config['location_name'])
+        _LOGGER.info("Swell sensor updating: %s", self.config["location_name"])
 
-        latitude = self.config['location_latitude']
-        longitude = self.config['location_longitude']
+        latitude = self.config["location_latitude"]
+        longitude = self.config["location_longitude"]
 
         url = f"https://marine-api.open-meteo.com/v1/marine?latitude={latitude}4&longitude={longitude}&current=wave_height&hourly=wave_height&temporal_resolution=hourly_3&models=best_match"
         headers = {
@@ -75,7 +75,7 @@ class CurrentDaySensor(Entity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return self._config_data['location_name'] + " current"
+        return self._config_data["location_name"] + " current"
 
     @property
     def state(self):
@@ -90,7 +90,7 @@ class CurrentDaySensor(Entity):
     @property
     def unique_id(self):
         """Return the unique ID of the sensor."""
-        return clean_string(self._config_data['location_name']) + "_current"
+        return clean_string(self._config_data["location_name"]) + "_current"
 
     def update_state(self, data):
         """Update the state of the sensor with new data."""
@@ -115,7 +115,7 @@ class DayForecastSensor(Entity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return self._config_data['location_name'] + " day" + str(self._sensor_day) + " forecast"
+        return self._config_data["location_name"] + " day" + str(self._sensor_day) + " forecast"
 
     @property
     def state(self):
@@ -130,7 +130,7 @@ class DayForecastSensor(Entity):
     @property
     def unique_id(self):
         """Return the unique ID of the sensor."""
-        return clean_string(self._config_data['location_name']) + "_day" + str(self._sensor_day) + "_forecast"
+        return clean_string(self._config_data["location_name"]) + "_day" + str(self._sensor_day) + "_forecast"
 
     def update_state(self, data):
         """Update the state of the sensor with new data."""
@@ -139,6 +139,6 @@ class DayForecastSensor(Entity):
         target_date = date_obj + timedelta(days=self._sensor_day)
         self._sensor_date = target_date
         self._sensor_data = data["forecast_data"]
-        self._state = datetime.now().isoformat()
+        self._state = target_date
         self._attributes = get_attributes(self, data)
         self.async_write_ha_state()

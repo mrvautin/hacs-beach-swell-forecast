@@ -1,40 +1,10 @@
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 import logging
 import re
 
 import aiohttp  # type: ignore  # noqa: PGH003
 
 _LOGGER = logging.getLogger(__name__)
-
-def epoch_to_iso(day):
-    """Convert epoch timestamp to ISO format.
-
-    Args:
-        day (dict): A dictionary containing 'timestamp' and 'utcOffset'.
-
-    Returns:
-        str: The ISO formatted date string.
-
-    """
-
-    dt = datetime.fromtimestamp(day['timestamp'], tz=UTC)
-    dt = dt + timedelta(hours=day['utcOffset'])
-    return dt.isoformat()
-
-def get_readable_date(day):
-    """Convert epoch timestamp to a readable date string.
-
-    Args:
-        day (dict): A dictionary containing 'timestamp' and 'utcOffset'.
-
-    Returns:
-        str: A readable date string in the format 'Day, Month DD, YYYY'.
-
-    """
-
-    dt = datetime.fromtimestamp(day['timestamp'], tz=UTC)
-    dt = dt + timedelta(hours=day['utcOffset'])
-    return dt.strftime("%A, %B %d, %Y")
 
 def clean_string(input_string):
     """Clean the input string by converting it to lowercase, replacing spaces with underscores, and removing non-alphanumeric characters.
@@ -49,14 +19,19 @@ def clean_string(input_string):
 
     input_string = input_string.lower()
     input_string = input_string.replace(" ", "_")
-    return re.sub(r'[^a-z0-9_]', '', input_string)
+    return re.sub(r"[^a-z0-9_]", "", input_string)
 
-def is_duplicate_entity(hass, unique_id):
+def optimal_wave(forecast):
     """Check if an entity with the given unique ID already exists."""
-    return any(
-        entity.entity_id for entity in hass.states.async_all()
-        if entity.attributes.get("unique_id") == unique_id
-    )
+
+    max_wave = None
+    max_wave_height = 0
+    for hourly in forecast:
+        wave_height = hourly["wave_height"]
+        if wave_height > max_wave_height:
+            max_wave_height = wave_height
+            max_wave = str(wave_height) + "m @ " + hourly["time_value"]
+    return max_wave
 
 def split_forecast(forecast):
     """Check if an entity with the given unique ID already exists."""
@@ -143,6 +118,6 @@ def get_attributes(self, wave):
     response = {}
     response["forecast"] = wave["forecast_data"][target_date]
     response["height_metric"] = wave["current_units"]["wave_height"]
-    # response["optimal_wave"] = optimal_wave TODO: Implement optimal wave
+    response["optimal_wave"] = optimal_wave(response["forecast"])
 
     return response
