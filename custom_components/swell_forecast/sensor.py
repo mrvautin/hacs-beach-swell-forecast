@@ -105,12 +105,12 @@ class CurrentDaySensor(Entity):
 class DayForecastSensor(Entity):
     """Representation of a day forecast sensor."""
 
-    def __init__(self, config_data, SensorDay):
+    def __init__(self, config_data, sensor_day):
         """Initialize the sensor with configuration data and the sensor day."""
         self._state = None
         self._attributes = {}
         self._config_data = config_data
-        self._sensor_day = SensorDay
+        self._sensor_day = sensor_day
 
     @property
     def name(self):
@@ -136,7 +136,7 @@ class DayForecastSensor(Entity):
         """Update the state of the sensor with new data."""
 
         date_obj = datetime.fromisoformat(data["current"]["time"].replace("Z", "+00:00"))
-        target_date = date_obj + timedelta(days=self._sensor_day)
+        target_date = date_obj + timedelta(days=self._sensor_day - 1)
         self._sensor_date = target_date
         self._sensor_data = data["forecast_data"]
         self._state = target_date

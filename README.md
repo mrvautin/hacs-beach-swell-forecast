@@ -10,15 +10,10 @@ This project provides a Home Assistant HACS integration to display a 7 day forec
 
 A sensor is created with forecasts the next 7 days with data like: 
 
-- `Probability` = Percentage probability/accuracy
-- `SurfMinFt` = Minimum surf height in feet 
-- `SurfMaxFt` = Maximum surf height in feet 
-- `SurfMinM` = Minimum surf height in meters 
-- `SurfMaxM` = Maximum surf height in meters 
-- `SurfPower` = The power of the swell
-- `OptimalScore` = The wave score
-- `HumanRelation` = The human relation measurement
-- `ForecastDate` = The date of the forecast
+- `Forecast` = Wave height and time. Updated every 3 hours
+- `height_metric` = The metric to measure the wave
+- `optimal_wave` = The biggest wave height and time for the day
+- `updated` = The date last updated
 
 ## Installation
 
