@@ -1,7 +1,7 @@
 # Swell Forecast
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/mrvautin/hacs-beach-swell-forecast/refs/heads/main/assets/logo.png" width="150px" />
+  <img src="https://raw.githubusercontent.com/mrvautin/hacs-beach-swell-forecast/refs/heads/main/custom_components/swell_forecast/assets/logo.png" width="150px" />
 </p>
 
 This project provides a Home Assistant HACS integration to display a 7 day forecast for beach swells using [Surfline](https://www.surfline.com) data.
@@ -39,7 +39,7 @@ In `Swell location longitude` you will need to longitude value for your Swell.
 In Google Maps, right click the beach location, select the latitude and longitude menu to copy to your clipboard.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/mrvautin/hacs-beach-swell-forecast/refs/heads/main/assets/google-maps.png" width="450px" />
+  <img src="https://raw.githubusercontent.com/mrvautin/hacs-beach-swell-forecast/refs/heads/main/custom_components/swell_forecast/assets/google-maps.png" width="450px" />
 </p>
 
 ## Usage

@@ -119,5 +119,5 @@ def get_attributes(self, wave):
     response["forecast"] = wave["forecast_data"][target_date]
     response["height_metric"] = wave["current_units"]["wave_height"]
     response["optimal_wave"] = optimal_wave(response["forecast"])
-
+    response["updated"] = self._state
     return response
