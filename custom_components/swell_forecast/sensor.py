@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import logging
+import voluptuous as vol # type: ignore
 
 import aiohttp  # type: ignore[import]
 
@@ -25,17 +26,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         DayForecastSensor(entry.data, 5)
     ]
     async_add_entities(entities)
-    updater = DataUpdater(entities, config_data)
+    updater = DataUpdater(entities, config_data, hass)
     hass.loop.create_task(updater.async_update())
-
 
 class DataUpdater:
     """Class to update data for the sensors."""
 
-    def __init__(self, sensors, config):
+    def __init__(self, sensors, config, hass):
         """Initialize the data updater with sensors and configuration."""
         self.sensors = sensors
         self.config = config
+        self.hass = hass
 
     @Throttle(SCAN_INTERVAL)
     async def async_update(self):
@@ -44,8 +45,12 @@ class DataUpdater:
 
         latitude = self.config["location_latitude"]
         longitude = self.config["location_longitude"]
+        if not self.hass.config.time_zone:
+            time_zone = "auto"
+        else:
+            time_zone = self.hass.config.time_zone
 
-        url = f"https://marine-api.open-meteo.com/v1/marine?latitude={latitude}4&longitude={longitude}&current=wave_height&hourly=wave_height&temporal_resolution=hourly_3&models=best_match"
+        url = f"https://marine-api.open-meteo.com/v1/marine?latitude={latitude}4&longitude={longitude}&current=wave_height,swell_wave_height&hourly=wave_height&temporal_resolution=hourly_3&models=best_match&timezone={time_zone}"
         headers = {
             "Content-Type": "application/json",
         }
@@ -95,10 +100,44 @@ class CurrentDaySensor(Entity):
     def update_state(self, data):
         """Update the state of the sensor with new data."""
 
+        # Define the schema
+        current_schema = vol.Schema({
+            vol.Required("time"): str,
+            vol.Required("swell_wave_height"): vol.Any(int, float),
+            vol.Required("wave_height"): vol.Any(int, float),
+        }, extra=vol.ALLOW_EXTRA)
+
+        current_units = vol.Schema({
+            vol.Required("swell_wave_height"): str,
+            vol.Required("wave_height"): str,
+        }, extra=vol.ALLOW_EXTRA)
+
+        schema = vol.Schema({
+            vol.Required("current"): current_schema,
+            vol.Required("current_units"): current_units
+        }, extra=vol.ALLOW_EXTRA)
+
         current_data = {}
-        current_data["current_time"] = data["current"]["time"]
-        current_data["current_wave_height"] = data["current"]["wave_height"]
-        self._state = data["current"]["wave_height"]
+        try:
+            schema(data)
+            current_data["current_time"] = data["current"]["time"]
+            current_data["swell_height"] = data["current"]["swell_wave_height"]
+            current_data["swell_metric"] = data["current_units"]["swell_wave_height"]
+            current_data["wave_height"] = data["current"]["wave_height"]
+            current_data["wave_metric"] = data["current_units"]["wave_height"]
+            self._state = data["current"]["wave_height"]
+
+            # Set the interval
+            if data["current_units"]["interval"] == "seconds":
+                current_data["update_interval"] = data["current"]["interval"] / 60
+            if data["current_units"]["interval"] == "minutes":
+                current_data["update_interval"] = data["current"]["interval"]
+            current_data["update_interval_metric"] = "mins"
+        except vol.MultipleInvalid as e:
+            _LOGGER.info("Current day schema is not valid: %s", e)
+            self._state = "Invalid data"
+
+        # Set the attributes
         self._attributes = current_data
         self.async_write_ha_state()
 
