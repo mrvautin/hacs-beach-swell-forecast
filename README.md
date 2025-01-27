@@ -4,7 +4,9 @@
   <img src="https://raw.githubusercontent.com/mrvautin/hacs-beach-swell-forecast/refs/heads/main/custom_components/swell_forecast/assets/logo.png" width="150px" />
 </p>
 
-This project provides a Home Assistant HACS integration to display a 7 day forecast for beach swells using [Surfline](https://www.surfline.com) data.
+This project provides a Home Assistant HACS integration to display a 5 day forecast for beach swells using [OpenMateo](open-meteo.com) marine API.
+
+Best used in conjunction with the [Lovelace Swell Forecast Card](https://github.com/mrvautin/lovelace-swell-forecast-card).
 
 ## Features
 
