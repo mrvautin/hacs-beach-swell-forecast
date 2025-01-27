@@ -7,7 +7,7 @@ import aiohttp  # type: ignore[import]
 from homeassistant.config_entries import ConfigEntry  # type: ignore
 from homeassistant.core import HomeAssistant  # type: ignore
 from homeassistant.helpers.entity import Entity  # type: ignore
-from homeassistant.util import Throttle  # type: ignore
+from homeassistant.helpers.event import async_track_time_interval # type: ignore
 
 from .utils import clean_string, get_attributes, split_forecast
 
@@ -37,11 +37,12 @@ class DataUpdater:
         self.sensors = sensors
         self.config = config
         self.hass = hass
+        self._interval = SCAN_INTERVAL
+        async_track_time_interval(hass, self.async_update, self._interval)
 
-    @Throttle(SCAN_INTERVAL)
-    async def async_update(self):
+    async def async_update(self, now=None):
         """Fetch new data for the sensors and update their state."""
-        _LOGGER.info("Swell sensor updating: %s", self.config["location_name"])
+        _LOGGER.debug("Swell sensor updating: %s", self.config["location_name"])
 
         latitude = self.config["location_latitude"]
         longitude = self.config["location_longitude"]
@@ -56,7 +57,7 @@ class DataUpdater:
         }
         try:
             async with aiohttp.ClientSession() as session:
-                _LOGGER.info("Swell sensor updating data: %s", url)
+                _LOGGER.debug("Swell sensor updating data: %s", url)
                 async with session.get(url, headers=headers) as response:
                     if response.status == 200:
                         data = await response.json()
@@ -64,9 +65,9 @@ class DataUpdater:
                             data["forecast_data"] = split_forecast(data)
                             sensor.update_state(data)
                     else:
-                        _LOGGER.info("Swell sensor - Got data: %s", response.status)
+                        _LOGGER.debug("Swell sensor - Got data: %s", response.status)
         except aiohttp.ClientConnectorError as e:
-            _LOGGER.info("Error: %s", e)
+            _LOGGER.error("Error fetching from API: %s", e)
 
 class CurrentDaySensor(Entity):
     """Representation of a current day sensor."""
@@ -121,6 +122,7 @@ class CurrentDaySensor(Entity):
         try:
             schema(data)
             current_data["current_time"] = data["current"]["time"]
+            current_data["last_updated"] = datetime.now().isoformat()  # noqa: DTZ005
             current_data["swell_height"] = data["current"]["swell_wave_height"]
             current_data["swell_metric"] = data["current_units"]["swell_wave_height"]
             current_data["wave_height"] = data["current"]["wave_height"]
@@ -134,7 +136,7 @@ class CurrentDaySensor(Entity):
                 current_data["update_interval"] = data["current"]["interval"]
             current_data["update_interval_metric"] = "mins"
         except vol.MultipleInvalid as e:
-            _LOGGER.info("Current day schema is not valid: %s", e)
+            _LOGGER.error("Current day schema is not valid: %s", e)
             self._state = "Invalid data"
 
         # Set the attributes
