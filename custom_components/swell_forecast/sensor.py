@@ -50,7 +50,7 @@ class DataUpdater:
         else:
             time_zone = self.hass.config.time_zone
 
-        url = f"https://marine-api.open-meteo.com/v1/marine?latitude={latitude}4&longitude={longitude}&current=wave_height,swell_wave_height&hourly=wave_height&temporal_resolution=hourly_3&models=best_match&timezone={time_zone}"
+        url = f"https://marine-api.open-meteo.com/v1/marine?latitude={latitude}4&longitude={longitude}&current=wave_height,swell_wave_height&hourly=wave_height&daily=wave_height_max&models=best_match&timezone={time_zone}"
         headers = {
             "Content-Type": "application/json",
         }
