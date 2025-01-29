@@ -100,7 +100,6 @@ def get_face_scale(height, metric):
         }
     ]
     for score in scores:
-        _LOGGER.info("score: %s", score)
         if height > score["height_min_" + metric] and height < score["height_max_" + metric]:
             return {
                 "score": score["score"],

@@ -58,7 +58,7 @@ def split_forecast(forecast):
             dates_forecast[date_key] = []
         day_data = {}
         day_data["time_value"] = time_value
-        day_data["wave_height"] = forecast["hourly"]["wave_height"][index]
+        day_data["wave_height"] = round(forecast["hourly"]["wave_height"][index], 2)
 
         dates_forecast[date_key].append(day_data)
 
