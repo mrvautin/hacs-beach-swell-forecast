@@ -3,6 +3,7 @@ import logging
 import re
 
 import aiohttp  # type: ignore  # noqa: PGH003
+from .scoring import get_wave_score
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,82 +22,21 @@ def clean_string(input_string):
     input_string = input_string.replace(" ", "_")
     return re.sub(r"[^a-z0-9_]", "", input_string)
 
-def get_wave_score(height):
-    scores = [
-        {
-            "score": 1,
-            "height_min": 0,
-            "height_max": 0.10,
-            "desc": "Calm"
-        },
-        {
-            "score": 2,
-            "height_min": 0.10,
-            "height_max": 0.50,
-            "desc": "Smooth"
-        },
-        {
-            "score": 3,
-            "height_min": 0.5,
-            "height_max": 1.25,
-            "desc": "Slight"
-        },
-        {
-            "score": 4,
-            "height_min": 1.25,
-            "height_max": 2.50,
-            "desc": "Moderate"
-        },
-        {
-            "score": 5,
-            "height_min": 2.50,
-            "height_max": 4.00,
-            "desc": "Rough"
-        },
-        {
-            "score": 6,
-            "height_min": 4.00,
-            "height_max": 6.00,
-            "desc": "Very Rough"
-        },
-        {
-            "score": 7,
-            "height_min": 6.00,
-            "height_max": 9.00,
-            "desc": "High"
-        },
-        {
-            "score": 8,
-            "height_min": 6.00,
-            "height_max": 9.00,
-            "desc": "Very high"
-        },
-        {
-            "score": 9,
-            "height_min": 14.00,
-            "height_max": 200.00,
-            "desc": "Phenomenal"
-        }
-    ]
-    for score in scores:
-        if height > score["height_min"] and height < score["height_max"]:
-            return score
-
-
-def optimal_wave(forecast):
+def optimal_wave(forecast, wave):
     """Check if an entity with the given unique ID already exists."""
 
     max_wave = None
     max_wave_height = 0
+    wave_height_metric = wave["hourly_units"]["wave_height"]
     for hourly in forecast:
         wave_height = hourly["wave_height"]
         if wave_height > max_wave_height:
             max_wave_height = wave_height
-            max_wave = str(wave_height) + "m @ " + hourly["time_value"]
+            max_wave = str(wave_height) +  wave_height_metric + " @ " + hourly["time_value"]
     return {
         "max_wave_height": max_wave_height,
         "max_wave": max_wave,
-        "wave_score": get_wave_score(max_wave_height)
+        "wave_score": get_wave_score(max_wave_height, wave_height_metric)
     }
 
 def split_forecast(forecast):
@@ -184,6 +124,6 @@ def get_attributes(self, wave):
     response = {}
     response["forecast"] = wave["forecast_data"][target_date]
     response["height_metric"] = wave["current_units"]["wave_height"]
-    response["optimal_wave"] = optimal_wave(response["forecast"])
+    response["optimal_wave"] = optimal_wave(response["forecast"], wave)
     response["updated"] = self._state
     return response

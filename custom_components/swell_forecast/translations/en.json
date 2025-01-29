@@ -5,13 +5,15 @@
         "data": {
           "location_name": "Swell location name",
           "location_latitude": "Swell location latitude",
-          "location_longitude": "Swell location longitude"
+          "location_longitude": "Swell location longitude",
+          "measurement": "Swell height measurement"
         },
         "description": "Enter the details of the swell location you want to monitor.",
         "description_placeholders": {
           "location_name": "Swell name used to name sensor. Eg: Southport SA, Australia",
           "location_latitude": "Swell latitude - Can grab from Google Maps.",
-          "location_longitude": "Swell longitude - Can grab from Google Maps."
+          "location_longitude": "Swell longitude - Can grab from Google Maps.",
+          "measurement": "Swell height - Metres or feet."
         }
       }
     }

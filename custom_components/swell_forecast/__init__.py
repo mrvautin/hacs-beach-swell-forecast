@@ -1,9 +1,9 @@
 import logging  # noqa: D104
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.config_entries import ConfigEntry # type: ignore
+from homeassistant.const import Platform # type: ignore
+from homeassistant.core import HomeAssistant # type: ignore
+from homeassistant.exceptions import ConfigEntryNotReady # type: ignore
 
 from .const import DOMAIN
 from .utils import check_location

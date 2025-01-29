@@ -2,10 +2,9 @@
 
 import voluptuous as vol  # type: ignore[attr-defined]
 
-from homeassistant import config_entries
+from homeassistant import config_entries # type: ignore
 
 from .const import DOMAIN
-
 
 @config_entries.HANDLERS.register(DOMAIN)
 class BeachSwellForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -25,10 +24,12 @@ class BeachSwellForecastConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required("location_name", default="Southport SA, Australia"): str,
                 vol.Required("location_latitude", default="-35.160006845204165"): str,
                 vol.Required("location_longitude", default="138.46987943548"): str,
+                vol.Required("measurement"): vol.In(["Metres", "Feet"])
             }),
             description_placeholders={
                 "location_name": "Swell location name",
                 "location_latitude": "Swell latitude - Can grab from Google Maps.",
                 "location_longitude": "Swell longitude - Can grab from Google Maps.",
+                "measurement": "Swell height - Metres or feet.",
             }
         )
