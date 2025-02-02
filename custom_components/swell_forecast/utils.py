@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 import re
 
@@ -23,21 +23,53 @@ def clean_string(input_string):
     return re.sub(r"[^a-z0-9_]", "", input_string)
 
 def optimal_wave(forecast, wave):
-    """Check if an entity with the given unique ID already exists."""
+    """Clean the input string by converting it to lowercase, replacing spaces with underscores, and removing non-alphanumeric characters.
 
-    max_wave = None
-    max_wave_height = 0
-    wave_height_metric = wave["hourly_units"]["wave_height"]
-    for hourly in forecast:
-        wave_height = hourly["wave_height"]
-        if wave_height > max_wave_height:
-            max_wave_height = wave_height
-            max_wave = str(wave_height) +  wave_height_metric + " @ " + hourly["time_value"]
-    return {
-        "max_wave_height": max_wave_height,
-        "max_wave": max_wave,
-        "wave_score": get_wave_score(max_wave_height, wave_height_metric)
-    }
+    Args:
+        forecast (obj): Forecast object
+        wave (obj): Wave object
+
+    Returns:
+        obj: An object of the optimal wave.
+
+    """
+
+    try:
+        max_wave = None
+        max_swell = None
+        max_wave_height = 0
+        max_wave_time = 0
+        max_swell_height = 0
+        max_swell_time = 0
+        wave_height_metric = wave["hourly_units"]["wave_height"]
+        swell_height_metric = wave["hourly_units"]["swell_wave_height"]
+        for hourly in forecast:
+            wave_height = hourly["wave_height"]
+            swell_height = hourly["swell_height"]
+            if wave_height > max_wave_height:
+                max_wave_height = wave_height
+                max_wave_time = hourly["time"]
+                max_wave = str(wave_height) +  wave_height_metric + " @ " + hourly["time"]
+            if swell_height > max_swell_height:
+                max_swell_height = swell_height
+                max_swell_time = hourly["time"]
+                max_swell = str(swell_height) +  swell_height_metric + " @ " + hourly["time"]
+        return {
+            "wave": {
+                "max_height": max_wave_height,
+                "max_time": max_wave_time,
+                "max": max_wave,
+                "score": get_wave_score(max_wave_height, wave_height_metric)
+            },
+            "swell": {
+                "max_height": max_swell_height,
+                "max_time": max_swell_time,
+                "max": max_swell,
+                "score": get_wave_score(max_swell_height, swell_height_metric)
+            }
+        }
+    except aiohttp.ClientConnectorError as e:
+        _LOGGER.error("Error getting the optimal wave: %s", e)
 
 def split_forecast(forecast):
     """Check if an entity with the given unique ID already exists."""
@@ -53,12 +85,13 @@ def split_forecast(forecast):
         if date_obj.hour == 0:
             time_value = "12am"
 
-        date_key = str(date_obj.year) + str(date_obj.month) + str(date_obj.day)
+        date_key = date_obj.strftime("%Y%m%d")
         if date_key not in dates_forecast:
             dates_forecast[date_key] = []
         day_data = {}
-        day_data["time_value"] = time_value
+        day_data["time"] = time_value
         day_data["wave_height"] = round(forecast["hourly"]["wave_height"][index], 2)
+        day_data["swell_height"] = round(forecast["hourly"]["swell_wave_height"][index], 2)
 
         dates_forecast[date_key].append(day_data)
 
@@ -76,7 +109,7 @@ def get_date_key(iso_date):
     """
 
     date_obj = datetime.fromisoformat(iso_date.replace("Z", "+00:00"))
-    return str(date_obj.year) + str(date_obj.month) + str(date_obj.day)
+    return date_obj.strftime("%Y%m%d")
 
 async def check_location(location_lat, location_long):
     """Check if the given location ID is valid.
@@ -90,14 +123,22 @@ async def check_location(location_lat, location_long):
 
     """
 
-    url = f"https://marine-api.open-meteo.com/v1/marine?latitude={location_lat}4&longitude={location_long}&current=wave_height&hourly=wave_height&temporal_resolution=hourly_3&models=best_match"
+    params = {
+            "latitude": location_lat,
+            "longitude": location_long,
+            "hourly": ["wave_height", "wave_period", "swell_wave_height"],
+            "daily": ["wave_height_max", "swell_wave_height_max"],
+            "temporal_resolution": "hourly_3",
+            "models": "best_match"
+        }
+    url = "https://marine-api.open-meteo.com/v1/marine"
     headers = {
         "Content-Type": "application/json",
     }
     try:
         async with aiohttp.ClientSession() as session:
             _LOGGER.info("Checking location: %s / %s", location_lat, location_long)
-            async with session.get(url, headers=headers) as response:
+            async with session.get(url, headers=headers, params=params) as response:
                 if response.status == 200:
                    return True
                 _LOGGER.info("Got data: %s", response.status)
@@ -119,8 +160,7 @@ def get_attributes(self, wave):
 
     """
 
-    target_date = self._sensor_date + timedelta(days=1)
-    target_date = get_date_key(target_date.isoformat())
+    target_date = get_date_key(self._sensor_date.isoformat())
     response = {}
     response["forecast"] = wave["forecast_data"][target_date]
     response["height_metric"] = wave["current_units"]["wave_height"]

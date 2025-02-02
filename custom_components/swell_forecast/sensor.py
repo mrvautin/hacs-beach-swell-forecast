@@ -54,14 +54,26 @@ class DataUpdater:
         else:
             time_zone = self.hass.config.time_zone
 
-        url = f"https://marine-api.open-meteo.com/v1/marine?latitude={latitude}4&longitude={longitude}&current=wave_height,swell_wave_height&hourly=wave_height&daily=wave_height_max&models=best_match&timezone={time_zone}&length_unit={measurement}"
+        url = "https://marine-api.open-meteo.com/v1/marine"
+        params = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "current": ["wave_height", "wave_direction", "swell_wave_height"],
+            "hourly": ["wave_height", "wave_period", "swell_wave_height"],
+            "daily": ["wave_height_max", "swell_wave_height_max"],
+            "length_unit": measurement,
+            "timezone": time_zone,
+            "forecast_days": 5,
+            "temporal_resolution": "hourly_3",
+            "models": "best_match"
+        }
         headers = {
             "Content-Type": "application/json",
         }
         try:
             async with aiohttp.ClientSession() as session:
                 _LOGGER.debug("Swell sensor updating data: %s", url)
-                async with session.get(url, headers=headers) as response:
+                async with session.get(url, headers=headers, params=params) as response:
                     if response.status == 200:
                         data = await response.json()
                         for sensor in self.sensors:
